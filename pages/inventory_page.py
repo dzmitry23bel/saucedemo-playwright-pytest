@@ -1,3 +1,4 @@
+import allure
 from playwright.sync_api import Page
 
 from pages.base_page import BasePage
@@ -33,10 +34,12 @@ class InventoryPage(BasePage):
         slug = item_name.lower().replace(" ", "-").replace("'", "")
         return self.page.locator(f"#remove-{slug}")
 
+    @allure.step("Add '{item_name}' to the cart")
     def add_item_to_cart(self, item_name: str) -> "InventoryPage":
         self._add_to_cart_button(item_name).click()
         return self
 
+    @allure.step("Remove '{item_name}' from the cart")
     def remove_item_from_cart(self, item_name: str) -> "InventoryPage":
         self._remove_button(item_name).click()
         return self
@@ -46,12 +49,14 @@ class InventoryPage(BasePage):
             return int(self.cart_badge.inner_text())
         return 0
 
+    @allure.step("Open the cart")
     def open_cart(self):
         from pages.cart_page import CartPage
 
         self.cart_link.click()
         return CartPage(self.page)
 
+    @allure.step("Sort products by '{option}'")
     def sort_by(self, option: str) -> "InventoryPage":
         self.sort_dropdown.select_option(option)
         return self

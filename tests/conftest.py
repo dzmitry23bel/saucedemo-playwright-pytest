@@ -1,3 +1,4 @@
+import allure
 import pytest
 
 from data.users import STANDARD_USER
@@ -5,6 +6,21 @@ from pages.cart_page import CartPage
 from pages.checkout_page import CheckoutStepOnePage
 from pages.inventory_page import InventoryPage
 from pages.login_page import LoginPage
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    report = outcome.get_result()
+
+    if report.when == "call" and report.failed:
+        page = item.funcargs.get("page")
+        if page is not None:
+            allure.attach(
+                page.screenshot(),
+                name="screenshot-on-failure",
+                attachment_type=allure.attachment_type.PNG,
+            )
 
 
 @pytest.fixture

@@ -7,6 +7,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -29,14 +32,34 @@ jobs:
         run: playwright install --with-deps chromium
 
       - name: Run tests
-        run: pytest --browser chromium --html=report.html --self-contained-html
+        id: run_tests
+        run: pytest --browser chromium --alluredir=allure-results
+        continue-on-error: true
 
-      - name: Upload HTML report
+      - name: Load previous report history
+        uses: actions/checkout@v4
         if: always()
-        uses: actions/upload-artifact@v4
+        continue-on-error: true
         with:
-          name: pytest-html-report
-          path: report.html
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Build Allure report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          allure_results: allure-results
+          allure_history: allure-history
+          allure_report: allure-report
+          keep_reports: 20
+
+      - name: Publish report to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
 
       - name: Upload Playwright traces
         if: failure()
@@ -44,3 +67,7 @@ jobs:
         with:
           name: playwright-traces
           path: test-results/
+
+      - name: Fail workflow if tests failed
+        if: steps.run_tests.outcome == 'failure'
+        run: exit 1

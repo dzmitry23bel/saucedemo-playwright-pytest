@@ -6,6 +6,9 @@ __pycache__/
 test-results/
 playwright-report/
 report.html
+allure-results/
+allure-report/
+allure-history/
 .DS_Store
 .idea/
 .vscode/

@@ -1,3 +1,4 @@
+import allure
 from playwright.sync_api import Page
 
 from pages.base_page import BasePage
@@ -15,12 +16,14 @@ class CheckoutStepOnePage(BasePage):
         self.cancel_button = page.locator("#cancel")
         self.error_message = page.locator('[data-test="error"]')
 
+    @allure.step("Fill checkout information")
     def fill_information(self, first_name: str, last_name: str, postal_code: str) -> "CheckoutStepOnePage":
         self.first_name_input.fill(first_name)
         self.last_name_input.fill(last_name)
         self.postal_code_input.fill(postal_code)
         return self
 
+    @allure.step("Continue to order overview")
     def continue_to_overview(self):
         from pages.checkout_page import CheckoutStepTwoPage
 
@@ -53,6 +56,7 @@ class CheckoutStepTwoPage(BasePage):
         text = self.total_label.inner_text()
         return float(text.split("$")[-1])
 
+    @allure.step("Finish the order")
     def finish(self):
         from pages.checkout_page import CheckoutCompletePage
 

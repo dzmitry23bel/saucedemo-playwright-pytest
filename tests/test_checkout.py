@@ -1,6 +1,11 @@
+import allure
 import pytest
 
+pytestmark = pytest.mark.feature("Checkout")
 
+
+@allure.title("Full checkout flow completes an order")
+@allure.severity(allure.severity_level.BLOCKER)
 @pytest.mark.smoke
 def test_full_checkout_flow_completes_order(checkout_page_with_item):
     step_two = checkout_page_with_item.fill_information("John", "Doe", "12345").continue_to_overview()
@@ -16,6 +21,8 @@ def test_full_checkout_flow_completes_order(checkout_page_with_item):
     assert "Thank you" in complete_page.get_complete_header_text()
 
 
+@allure.title("Checkout requires first name, last name and postal code")
+@allure.severity(allure.severity_level.NORMAL)
 @pytest.mark.regression
 @pytest.mark.parametrize(
     "first_name, last_name, postal_code, expected_message",

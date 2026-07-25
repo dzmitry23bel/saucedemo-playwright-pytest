@@ -1,3 +1,4 @@
+import allure
 from playwright.sync_api import Page
 
 from pages.base_page import BasePage
@@ -16,17 +17,20 @@ class CartPage(BasePage):
     def get_item_names(self) -> list[str]:
         return self.item_names.all_inner_texts()
 
+    @allure.step("Remove '{item_name}' from the cart page")
     def remove_item(self, item_name: str) -> "CartPage":
         slug = item_name.lower().replace(" ", "-").replace("'", "")
         self.page.locator(f"#remove-{slug}").click()
         return self
 
+    @allure.step("Proceed to checkout")
     def checkout(self):
         from pages.checkout_page import CheckoutStepOnePage
 
         self.checkout_button.click()
         return CheckoutStepOnePage(self.page)
 
+    @allure.step("Continue shopping")
     def continue_shopping(self):
         from pages.inventory_page import InventoryPage
 
